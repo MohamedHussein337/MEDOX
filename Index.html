@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>MEDOX - الحل التلقائي</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f2f5; }
+        .card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 350px; text-align: center; }
+        h2 { color: #4a148c; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #4a148c; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; }
+        button:hover { background: #6a1b9a; }
+        #message { margin-top: 15px; font-weight: bold; }
+        .success { color: #2e7d32; }
+        .error { color: #c62828; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>MEDOX</h2>
+        <p>أدخل بيانات حسابك في منصة Qureo</p>
+        <input type="text" id="username" placeholder="Login ID">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="startSolving()">🚀 تسجيل الدخول وبدء الحل</button>
+        <div id="message"></div>
+    </div>
+
+    <script>
+        // ⚠️ ضع رابط Render بتاعك هنا بعد ما ترفع السيرفر
+        const SERVER_URL = 'https://YOUR-RENDER-APP-NAME.onrender.com';
+
+        async function startSolving() {
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            const msg = document.getElementById('message');
+
+            if(!user || !pass) {
+                msg.className = 'error';
+                msg.innerText = "❌ الرجاء إدخال البيانات كاملة";
+                return;
+            }
+
+            msg.className = '';
+            msg.innerText = "⏳ جاري التحقق والدخول للمنصة (قد يستغرق دقيقة إذا كان السيرفر نائماً)...";
+            msg.style.color = "blue";
+
+            try {
+                const response = await fetch(`${SERVER_URL}/api/solve`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: user, password: pass })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    msg.className = 'success';
+                    msg.innerHTML = "✅ تم الحل بنجاح!<br>راجع المنصة لتأكيد الإجابة.";
+                } else {
+                    msg.className = 'error';
+                    msg.innerText = data.message;
+                }
+            } catch (error) {
+                msg.className = 'error';
+                msg.innerText = "❌ فشل الاتصال بالسيرفر. تأكد من الرابط أو انتظر قليلاً.";
+            }
+        }
+    </script>
+</body>
+</html>
